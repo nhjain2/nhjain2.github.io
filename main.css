@@ -1,0 +1,72 @@
+.text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.titles {
+    text-align: center;
+    font-family: sans-serif;
+    padding-top: 20px;
+}
+
+.intro {
+    font: 18px sans-serif;
+    padding-bottom: 10px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.text {
+    font: 16px sans-serif;
+}
+
+.note {
+    font: 13px sans-serif;
+}
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    width: auto;
+    height: auto;
+    padding: 8px;
+    font: 13px sans-serif;
+    background: #cccccc;
+    border: 1px;
+    border-radius: 5px;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.buttons {
+    display: flex;
+    margin-top: 20px;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px;
+    font-size: 16px;
+    font-family: sans-serif;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: white;
+    background-color: #00b300;
+    border: none;
+    border-radius: 5px;
+}
+
+.button:hover {background-color: #008000}
+
+.button:active {
+    background-color: #004d00;
+}

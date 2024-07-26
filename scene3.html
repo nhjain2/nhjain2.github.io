@@ -1,0 +1,175 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="main.css" />
+</head>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+<script src="colors.js"></script>
+<body onload='init()'>
+    <div class="container">
+        <h2 class="titles">City vs Highway MPG for Gas/Diesel and Electric Cars</h2>
+        <p class="text">Finally, let's compare the average city and highway MPG for cars using gasoline/diesel and electricity.</p>
+        <p class="note">*Hover over each point to see details!</p>
+        <div class="svg">
+            <svg width=1000 height=1000></svg>
+        </div>
+        <div class="tooltip" id="tooltip"></div>
+        <div class="text-container">
+            <p class="text">
+                As we can see, the electric cars have significantly higher city and highway MPG values. The car with the highest values (150 city MPG, 122 highway MPG)
+                is electric. The gas and diesel cars with highest values, all below 50, do not even come close to the electric car with the lowest values 
+                (city MPG 85, highway MPG 82).
+            </p>
+            <p class="text">
+                Therefore, we can conclude that electric cars are the most fuel-efficient choice and will help the most with reducing our impact on the environment.
+            </p>
+        </div>
+        <div class=""buttons>
+            <a href="scene2.html" class="button">Back</a>
+            <a href="index.html" class="button">Restart</a>
+        </div>
+    </div>
+    <script>
+        async function init() {
+            const data = await d3.csv('https://flunky.github.io/cars2017.csv');
+        
+            const width = 600;
+            const height = 600;
+            const margin = 200;
+        
+            const xScale = d3.scaleLog().domain([10, 150]).range([0, width]);
+            const yScale = d3.scaleLog().domain([10, 150]).range([height, 0]);
+        
+            const svg = d3.select('svg')
+                .attr('width', width + 2 * margin)
+                .attr('height', height + margin/2)
+                .append('g')
+                .attr('transform', `translate(${margin},10)`);
+            
+            const fuels = Array.from(new Set(data.map(d => d.Fuel)));
+        
+            const tooltip = d3.select("#tooltip");
+        
+            svg.selectAll('circle')
+                .data(data)
+                .enter()
+                .append('circle')
+                .attr('cx', d => xScale(+d.AverageCityMPG))
+                .attr('cy', d => yScale(+d.AverageHighwayMPG))
+                .attr('r', 5)
+                .style('stroke', 'black')
+                .attr('fill', d => window.colorScale(d.Fuel))
+                .on('mouseover', function(d) {
+                    tooltip.transition().duration(200).style('opacity', .9);
+                    tooltip.html(`Fuel: ${d.Fuel}<br>City MPG: ${d.AverageCityMPG}<br>Highway MPG: ${d.AverageHighwayMPG}`)
+                        .style('left', (d3.event.pageX + 7) + 'px')
+                        .style('top', (d3.event.pageY + 7) + 'px');
+                    d3.select(this).attr('r', 8);
+                })
+                .on('mouseout', function(d) {
+                    tooltip.transition().duration(500).style('opacity', 0);
+                    d3.select(this).attr('r', 5);
+                });
+        
+            const xAxis = d3.axisBottom(xScale)
+                .tickValues([10, 20, 50, 100, 150])
+                .tickFormat(d3.format("~s"));
+        
+            const yAxis = d3.axisLeft(yScale)
+                .tickValues([10, 20, 50, 100, 150])
+                .tickFormat(d3.format("~s"));
+        
+            svg.append('g')
+                .attr('transform', `translate(0, ${height})`)
+                .call(xAxis);
+        
+            svg.append('g')
+                .call(yAxis);
+
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', height + 50)
+                .attr('text-anchor', 'middle')
+                .text('Average City MPG')
+                .attr('class', 'axis-label')
+                .style('font-family', 'sans-serif');
+
+            svg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('x', -height / 2)
+                .attr('y', -margin / 2 + 50)
+                .attr('text-anchor', 'middle')
+                .text('Average Highway MPG')
+                .attr('class', 'axis-label')
+                .style('font-family', 'sans-serif');
+
+            const annotations = [
+                {
+                    note: {
+                        label: ''
+                    },
+                    x: xScale(35),
+                    y: yScale(42),
+                    dy: 10,
+                    dx: 60,
+                    color: 'red',
+                    type: d3.annotationCallout
+                },
+                {
+                    note: {
+                        label: 'Highest City and Highway MPG for Gasoline'
+                    },
+                    x: xScale(39),
+                    y: yScale(36),
+                    dy: -24,
+                    dx: 35,
+                    color: 'red',
+                    type: d3.annotationCallout
+                },
+                {
+                    note: {
+                        label: 'Highest City and Highway MPG for Diesel'
+                    },
+                    x: xScale(30),
+                    y: yScale(41),
+                    dy: -10,
+                    dx: -70,
+                    color: 'red',
+                    type: d3.annotationCallout
+                },
+                {
+                    note: {
+                        label: 'Highest City and Highway MPG for Electricity'
+                    },
+                    x: xScale(150),
+                    y: yScale(122),
+                    dy: 50,
+                    dx: 50,
+                    color: 'red',
+                    type: d3.annotationCallout
+                },
+                {
+                    note: {
+                        label: 'Lowest City and Highway MPG for Electricity'
+                    },
+                    x: xScale(85),
+                    y: yScale(82),
+                    dy: 40,
+                    dx: 50,
+                    color: 'red',
+                    type: d3.annotationCallout
+                }
+            ];
+
+            const makeAnnotations = d3.annotation()
+                .annotations(annotations);
+
+            svg.append('g')
+                .attr('class', 'annotation-group')
+                .style('font-family', 'sans-serif')
+                .call(makeAnnotations);
+        
+        }
+    </script>
+</body>
+</html>
